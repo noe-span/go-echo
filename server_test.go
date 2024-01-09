@@ -4,16 +4,17 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestMain(m *testing.M) {
-	fmt.Println("TestMain Method")
-	fmt.Println("init...")
-}
+// func TestMain(m *testing.M) {
+// 	fmt.Println("TestMain Method")
+// 	fmt.Println("init...")
+// }
 
 func TestSetup1(t *testing.T) {
 
@@ -22,73 +23,86 @@ func TestSetup1(t *testing.T) {
 	req := httptest.NewRequest(http.MethodGet, "/hello", nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	c.SetPath("/hello")
-	// c.Param("eon")
-	// c.QueryParam("eon")
-
-	fmt.Println(rec.Body.String())
-
-	Greetings(c)
 
 	if assert.NoError(t, Greetings(c)) {
 		// your assertions about the response etc
 		fmt.Println("Test PASSED")
+		assert.Equal(t, http.StatusOK, rec.Code)
+
+		fmt.Println(rec.Body.String())
+
 	} else {
 		fmt.Println("Test FAILED")
 	}
 
-	// tr := &http.Transport{}
-	// client := &http.Client{Transport: tr}
-
-	// // Call the api
-	// respApi, err := client.Get(
-	// 	"http://localhost:3000/hello/eon",
-	// )
-
-	// fmt.Println("respAPI", respApi.Body)
-
-	// fmt.Println("error", err)
-
 }
-
-// func testHanlder1(c echo.Context) {
-
-// }
 
 func TestSetup2(t *testing.T) {
 
 	//setup 2
 	e := echo.New()
-	req := httptest.NewRequest(http.MethodGet, "/hello/eon", nil)
+	req := httptest.NewRequest(http.MethodGet, "/hello", nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	c.SetPath("/hello/eon")
+	c.SetParamNames("name")
+	c.SetParamValues("eon")
 
-	fmt.Println(rec.Body)
+	if assert.NoError(t, GreetingsWithParams(c)) {
+		// your assertions about the response etc
+		fmt.Println("Test PASSED")
+		assert.Equal(t, http.StatusOK, rec.Code)
+
+		fmt.Println(rec.Body.String())
+
+	} else {
+		fmt.Println("Test FAILED")
+	}
 
 }
-
-// func testHanlder2(c echo.Context) {
-
-// }
 
 func TestSetup3(t *testing.T) {
 
 	//setup 3
 	e := echo.New()
-	req := httptest.NewRequest(http.MethodGet, "/hello-queries", nil)
+	query := "?name=eon"
+	req := httptest.NewRequest(http.MethodGet, "/hello-queries"+query, nil)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
-	c.SetPath("hello-queries")
-	c.SetParamNames("name")
-	c.SetParamValues("eon")
 
-	fmt.Println(rec.Body)
+	if assert.NoError(t, GreetingsWithQuery(c)) {
+		// your assertions about the response etc
+		fmt.Println("Test PASSED")
+		assert.Equal(t, http.StatusOK, rec.Code)
+
+		fmt.Println(rec.Body.String())
+
+	} else {
+		fmt.Println("Test FAILED")
+	}
 
 }
 
-// func testHanlder3(c echo.Context) {
+func TestSetup3QueryParams(t *testing.T) {
 
-// 	c.Get()
+	//setup 3 (Query Params)
 
-// }
+	q := make(url.Values)
+	q.Set("name", "eon")
+
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodGet, "/hello-queries?"+q.Encode(), nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	if assert.NoError(t, GreetingsWithQuery(c)) {
+		// your assertions about the response etc
+		fmt.Println("Test PASSED")
+		assert.Equal(t, http.StatusOK, rec.Code)
+
+		fmt.Println(rec.Body.String())
+
+	} else {
+		fmt.Println("Test FAILED")
+	}
+
+}
