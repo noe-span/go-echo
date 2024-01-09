@@ -197,3 +197,28 @@ func TestSetup4(t *testing.T) {
 	}
 
 }
+
+func TestSetup5(t *testing.T) {
+
+	//setup 1
+	e := echo.New()
+	req := httptest.NewRequest(http.MethodPost, "/hello-user-post", nil)
+	rec := httptest.NewRecorder()
+	c := e.NewContext(req, rec)
+
+	json := "{\"name\":\"eon\",\"age\":99}"
+
+	if assert.NoError(t, UserPost(c)) {
+		// your assertions about the response etc
+		fmt.Println("Test PASSED")
+		assert.Equal(t, http.StatusOK, rec.Code)
+
+		fmt.Println(rec.Body.String())
+
+		assert.Equal(t, json, rec.Body.String())
+
+	} else {
+		fmt.Println("Test FAILED")
+	}
+
+}

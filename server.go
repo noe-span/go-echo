@@ -12,6 +12,11 @@ type HelloWorld struct {
 	Message string `json:"message"`
 }
 
+type User struct {
+	Name string `json:"name"`
+	Age  int64  `json:"age"`
+}
+
 func main() {
 	e := echo.New()
 
@@ -26,6 +31,9 @@ func main() {
 
 	//http://localhost:3000/hello-post
 	e.POST("/hello-post", GreetingsWithPost)
+
+	//http://localhost:3000/hello-user-post
+	e.POST("/hello-user-post", UserPost)
 
 	e.Logger.Fatal(e.Start(":3000"))
 }
@@ -55,6 +63,32 @@ func GreetingsWithPost(c echo.Context) error {
 		Message: "Hello World",
 	})
 }
+
+func UserPost(c echo.Context) error {
+
+	u := new(User)
+
+	u.Name = "eon"
+	u.Age = 99
+
+	//[]byte
+	jsonData, err := json.Marshal(u)
+	if err != nil {
+		fmt.Println("Error:", err)
+
+	}
+
+	return c.JSONBlob(
+		http.StatusOK,
+		[]byte(jsonData),
+	)
+}
+
+/*
+===============================================================================
+json
+===============================================================================
+*/
 
 // Encode a data structure into JSON
 func Marshal(h HelloWorld) string {
